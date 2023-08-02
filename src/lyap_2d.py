@@ -38,9 +38,7 @@ def do_2d_lyapunov(game, seed, mix_coeff, gamma,
     axs.set_aspect(aspect=1.0)
 
     if do_print:
-        if not os.path.isdir('images/' + save_name):
-            os.mkdir('images/' + save_name)
-        file = open("/images/"+save_name, "x")
+        file = open("runs/" + save_name, "w")
 
     if do_sigmoid_range:
         eps = 1e-8
@@ -165,6 +163,6 @@ def do_2d_lyapunov(game, seed, mix_coeff, gamma,
     axs.set_ylabel("Player 2 P(D|State)")
     plt.title(title, pad=20)
     
-    plt.savefig(f'{"/images/"+save_name}.pdf', 
-                transparent=True, bbox_inches='tight', dpi=300)
+    #image = open(, 'x')
+    plt.savefig("images/" + save_name + '.pdf', transparent=True, bbox_inches='tight', dpi=300)
     if do_print: file.close()

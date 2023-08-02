@@ -13,7 +13,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 parser = argparse.ArgumentParser()
 parser.add_argument("--game", type=str, required=True)
 parser.add_argument("--optimiser", type=str, required=True)
-parser.add_argument("--seed", type=int, default=None)
+parser.add_argument("--seed", type=int, default=0)
 parser.add_argument("--num_bin", type=int, default=11)
 parser.add_argument("--print", type=bool, default=True)
 args = parser.parse_args()
