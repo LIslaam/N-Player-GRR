@@ -7,6 +7,7 @@ import jax.numpy as jnp
 import numpy as np
 import argparse
 from lyap_2d import do_2d_lyapunov
+from lyap_3d import do_3d_lyapunov
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -16,6 +17,7 @@ parser.add_argument("--optimiser", type=str, required=True)
 parser.add_argument("--seed", type=int, default=0)
 parser.add_argument("--num_bin", type=int, default=11)
 parser.add_argument("--print", type=bool, default=True)
+parser.add_argument("--dimensions", type=int, default=2) # 2D Lyapunov or 3D Lyapunov
 args = parser.parse_args()
 
 
@@ -26,6 +28,7 @@ if __name__ == "__main__":
     do_print = args.print
     game = args.game
     opt = args.optimiser
+    dims = args.dimensions
     
     mix_coeff = 0.25
     gamma = 0.9
@@ -72,7 +75,13 @@ if __name__ == "__main__":
     #f"Game={game}_Opt={opt}_SigRange={do_sigmoid_range}_Key={temp_ax_key}_Num={num_lyapunov_iters}_dstrat={d_strategy}"
     title = f'{game_labels} {opt_labels} $lr=${alpha}'
 
-    levels = do_2d_lyapunov(game, seed, mix_coeff, gamma, alpha, opt, num_bin, ax_key, num_directions,
-                            do_sigmoid_range, num_lyapunov_iters, save_name, title, do_print, do_legend,
-                            tune_first_dir, tune_every_dir, use_smart_dir, do_trajectories)
+    if dims==2:
+        levels = do_2d_lyapunov(game, seed, mix_coeff, gamma, alpha, opt, num_bin, ax_key, num_directions,
+                                do_sigmoid_range, num_lyapunov_iters, save_name, title, do_print, do_legend,
+                                tune_first_dir, tune_every_dir, use_smart_dir, do_trajectories)
+        
+    if dims==3:
+        levels = do_3d_lyapunov(game, seed, mix_coeff, gamma, alpha, opt, num_bin, ax_key, num_directions,
+                                do_sigmoid_range, num_lyapunov_iters, save_name, title, do_print, do_legend,
+                                tune_first_dir, tune_every_dir, use_smart_dir, do_trajectories)        
         
