@@ -10,7 +10,80 @@ def sigmoid(x): return 1 / (1 + jnp.exp(-x))
 @jax.jit
 def activation(x): return sigmoid(x)
 
-def logit(x): return jnp.log(x / (1.0 - x))
+def logit(x): return jnp.log(x / (1.0 - x)) 
+
+
+#------------ AN ENVIRONMENT LABEEBAH WROTE ---------
+def offense_defense(gamma=0.99, fixed_defect=-3.0): # Fixed defect: We fix the strategy if our
+                                                        #opponent defects, to defect with high probability
+  dims = [1, 1, 1] 
+  payout_mat_1 = jnp.array([[[0,1],[-2,1]], [[1,-2],[1,0]]]) # 3D tensor
+  payout_mat_2 = jnp.array([[[0,-2],[1,1]], [[1,1],[-2,0]]])
+  payout_mat_3 = jnp.array([[[0,1],[1,-2]], [[-2,1],[1,0]]]) # 3 players, 3 matrices
+
+  @jax.jit
+  def get_M(th):
+    p_1_0, p_2_0, p_3_0  = (jnp.array([activation(th[0])]), 
+                            jnp.array([activation(th[1])]),
+                            jnp.array([activation(th[2])]))
+    p = jnp.concatenate([p_1_0*p_2_0*p_3_0, p_1_0*p_2_0*(1-p_3_0), 
+                         p_1_0*(1-p_2_0)*p_3_0, (1-p_1_0)*p_2_0*p_3_0,
+                         (1-p_1_0)*p_2_0*(1-p_3_0), (1-p_1_0)*(1-p_2_0)*p_3_0,
+                         p_1_0*(1-p_2_0)*(1-p_3_0), (1-p_1_0)*(1-p_2_0)*(1-p_3_0)])
+    
+    new_p_1, new_p_2, new_p_3 = (jnp.reshape(activation(th[0]), (1, 1)), 
+                                 jnp.reshape(activation(th[1]), (1, 1)),
+                                 jnp.reshape(activation(th[1]), (1, 1)))
+    fixed = jnp.reshape(activation(jnp.array([fixed_defect])), (1, 1)) # fixed high probability of offense if opponent offends
+
+    #                               P(D|DDD), P(D|DDO), P(D|DOD), P(D|ODD), P(D|DOO), P(D|ODO), P(D|OOD), P(D|OOO)
+    modified_th0 = jnp.concatenate([new_p_1, fixed, fixed, new_p_1, fixed, fixed, fixed, fixed]) # jnp.concatenate([fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed]) # jnp.concatenate([new_p_1, new_p_1, new_p_1, new_p_1, fixed, new_p_1, new_p_1, fixed]) #  # CAT LINE
+    modified_th1 = jnp.concatenate([new_p_2, fixed, new_p_2, fixed, fixed, fixed, fixed, fixed]) # jnp.concatenate([fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed]) # jnp.concatenate([new_p_2, new_p_2, new_p_2, new_p_2, new_p_2, fixed, new_p_2, fixed])  # CAT LINE   
+    modified_th2 = jnp.concatenate([fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed]) # jnp.concatenate([new_p_3, new_p_3, new_p_3, new_p_3, new_p_3, new_p_3, fixed, fixed]) # jnp.concatenate([new_p_3, new_p_3, fixed, fixed, fixed, fixed, fixed, fixed]) # CAT LINE #Freezing agent! Not learning #
+    p_1, p_2, p_3 = (jnp.reshape(modified_th0, (8, 1)), 
+                     jnp.reshape(modified_th1, (8, 1)),
+                     jnp.reshape(modified_th2, (8, 1)))# 8 states
+    P = jnp.concatenate([p_1*p_2*p_3, p_1*p_2*(1-p_3), 
+                         p_1*(1-p_2)*p_3, (1-p_1)*p_2*p_3,
+                         (1-p_1)*p_2*(1-p_3), (1-p_1)*(1-p_2)*p_3,
+                         p_1*(1-p_2)*(1-p_3), (1-p_1)*(1-p_2)*(1-p_3)],
+                        axis=1)  # CAT LINE
+    M = -jnp.matmul(p, jnp.linalg.inv(jnp.eye(8)-gamma*P))
+
+    return M
+
+  @jax.jit
+  def L_1(th):
+    M = get_M(th)
+    L_1 = jnp.matmul(M, jnp.reshape(payout_mat_1, (8, 1)))
+    return (1 - gamma)*L_1[0]
+
+  @jax.jit
+  def L_2(th):
+    M = get_M(th)
+    L_2 = jnp.matmul(M, jnp.reshape(payout_mat_2, (8, 1)))
+    return (1 - gamma)*L_2[0]
+
+  @jax.jit
+  def L_3(th):
+    M = get_M(th)
+    L_3 = jnp.matmul(M, jnp.reshape(payout_mat_3, (8, 1)))
+    return (1 - gamma)*L_3[0]
+
+  @jax.jit 
+  def Ls(th): return jnp.asarray([L_1(th), L_2(th), L_3(th)])
+
+  grad_L_1 = jax.jit(jax.grad(L_1, argnums=(0)))
+  grad_L_2 = jax.jit(jax.grad(L_2, argnums=(0)))
+  grad_L_3 = jax.jit(jax.grad(L_3, argnums=(0)))
+  @jax.jit
+  def grad_Ls(th): return jnp.asarray([grad_L_1(th)[0], 
+                                           grad_L_2(th)[1],
+                                           grad_L_3(th)[2]])
+
+  return dims, Ls, grad_Ls, # grad_L_1, grad_L_2, grad_L_3# get_M, L_1
+# ------- ^^^^ The 3 player environment Labeebah wrote
+
   
 def matching_and_ipd(gamma=0.99, fixed_defect=-3.0, weighting=.25):
   dims = [1, 1]

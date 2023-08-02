@@ -3,7 +3,7 @@ pkg_resources.require("jax==0.2.22")
 pkg_resources.require("jaxlib==0.1.76")
 import jax
 from environments import *
-from optimisers import *
+from optimisers import * 
 
 def setup_game_and_opt(game, mix_coeff, gamma, opt, alpha, num_lyapunov_iters, use_fixed_direction,
                        tune_first_dir, tune_every_dir, use_smart_dir, num_directions, seed,
