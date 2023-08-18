@@ -1,6 +1,6 @@
 import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
+pkg_resources.require("jax==0.2.22")
+pkg_resources.require("jaxlib==0.1.76")
 import os
 import jax
 import jax.numpy as jnp
@@ -31,7 +31,7 @@ def do_3d_lyapunov(game, seed, mix_coeff, gamma,
     num_params = np.sum(dims)
 
     if do_print:
-        file = open("runs/"+save_name+".txt", "x")
+        file = open("runs/"+save_name+".txt", "w")
     
     if do_sigmoid_range:
         eps = 1e-8
@@ -125,36 +125,34 @@ def do_3d_lyapunov(game, seed, mix_coeff, gamma,
     if do_trajectories:
         color = 'r' #cm.rainbow(np.linspace(0, 1, len(x_)*len(y_)))
         num_iters = num_lyapunov_iters
-        for i in tqdm(range(num_bin)):
-            for x in x_:
-                for i in tqdm(range(num_bin)):
-                    for y in y_:
-                        for z in z_:
-                            th_current = jnp.array([x, y, z])
-                            ths = [th_current]
-                            jacobian = jac_fixed_point_op(th_current)
-                            traces = [jnp.trace(jacobian)]
-                            determinants = [jnp.linalg.det(jacobian)]
-                            lyap_current = get_lyapunov(th_current, seed=0)
-                            lyaps = [lyap_current]
-                            losses = [jnp.abs(lyap_current)]
-                            for _ in range(num_iters):
-                                th_current = fixed_point_op(th_current)
-                                jacobian = jac_fixed_point_op(th_current)
-                                traces.append(jnp.trace(jacobian))
-                                determinants.append(jnp.linalg.det(jacobian))
-                                ths.append(th_current)
-                                lyap_current = get_lyapunov(th_current, seed=seed)
-                                lyaps.append(lyap_current)
-                                losses.append(jnp.abs(lyap_current))
-                                if do_print: 
-                                    file.write(f"iter={_},det={determinants[-1]},trace={traces[-1]},lyap={lyaps[-1]},loss={losses[-1]},th={ths[-1]}\n") #th={ths[-1]}
-                            ths = np.array(ths)
-                            # Plotting the trajectory!
-                            axs.plot(activation(ths[:, 0]), activation(ths[:, 1]), activation(ths[:, 2]), alpha=0.1, color=color)
-                            axsxy.plot(activation(ths[:, 0]), activation(ths[:, 1]), alpha=0.1, color=color)
-                            axsyz.plot(activation(ths[:, 1]), activation(ths[:, 2]), alpha=0.1, color=color)
-                            axsxz.plot(activation(ths[:, 0]), activation(ths[:, 2]), alpha=0.1, color=color)
+        for x in x_:
+            for y in y_:
+                for z in z_:
+                    th_current = jnp.array([x, y, z])
+                    ths = [th_current]
+                    jacobian = jac_fixed_point_op(th_current)
+                    traces = [jnp.trace(jacobian)]
+                    determinants = [jnp.linalg.det(jacobian)]
+                    lyap_current = get_lyapunov(th_current, seed=0)
+                    lyaps = [lyap_current]
+                    losses = [jnp.abs(lyap_current)]
+                    for _ in range(num_iters):
+                        th_current = fixed_point_op(th_current)
+                        jacobian = jac_fixed_point_op(th_current)
+                        traces.append(jnp.trace(jacobian))
+                        determinants.append(jnp.linalg.det(jacobian))
+                        ths.append(th_current)
+                        lyap_current = get_lyapunov(th_current, seed=seed)
+                        lyaps.append(lyap_current)
+                        losses.append(jnp.abs(lyap_current))
+                        if do_print: 
+                            file.write(f"iter={_},det={determinants[-1]},trace={traces[-1]},lyap={lyaps[-1]},loss={losses[-1]},th={ths[-1]}\n") #th={ths[-1]}
+                    ths = np.array(ths)
+                    # Plotting the trajectory!
+                    axs.plot(activation(ths[:, 0]), activation(ths[:, 1]), activation(ths[:, 2]), alpha=0.1, color=color)
+                    axsxy.plot(activation(ths[:, 0]), activation(ths[:, 1]), alpha=0.1, color=color)
+                    axsyz.plot(activation(ths[:, 1]), activation(ths[:, 2]), alpha=0.1, color=color)
+                    axsxz.plot(activation(ths[:, 0]), activation(ths[:, 2]), alpha=0.1, color=color)
 
     if do_legend:
         fig.legend(loc='upper left')
@@ -210,12 +208,12 @@ def do_3d_lyapunov(game, seed, mix_coeff, gamma,
     axsyz.set_title(title+' YZ View', pad=20)
     axsxz.set_title(title+' XZ View', pad=20)
   
-    fig.savefig(f'{"images/"+save_name+"/3D"}.pdf', 
+    fig.savefig(f'{"images/"+save_name+"_3D"}.pdf', 
                 transparent=True, bbox_inches='tight', dpi=300)
-    figxy.savefig(f'{"images/"+save_name+"/XY"}.pdf', 
+    figxy.savefig(f'{"images/"+save_name+"_XY"}.pdf', 
                 transparent=True, bbox_inches='tight', dpi=300)
-    figyz.savefig(f'{"images/"+save_name+"/YZ"}.pdf', 
+    figyz.savefig(f'{"images/"+save_name+"_YZ"}.pdf', 
                 transparent=True, bbox_inches='tight', dpi=300)
-    figxz.savefig(f'{"images/"+save_name+"/XZ"}.pdf', 
+    figxz.savefig(f'{"images/"+save_name+"_XZ"}.pdf', 
                 transparent=True, bbox_inches='tight', dpi=300)
     if do_print: file.close()

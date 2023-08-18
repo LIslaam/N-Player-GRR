@@ -1,6 +1,6 @@
 import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
+pkg_resources.require("jax==0.2.22")
+pkg_resources.require("jaxlib==0.1.76")
 import jax
 from environments import *
 from optimisers import * 
@@ -11,7 +11,9 @@ from optimisers import *
 def setup_game_and_opt(game, mix_coeff, gamma, opt, alpha, num_lyapunov_iters, use_fixed_direction,
                        tune_first_dir, tune_every_dir, use_smart_dir, num_directions, seed,
                        entropy_objective_strat='min'):
-  if game == 'mix':
+  if game == 'offense-defense' or game=='o-d': # 3D game!
+    dims, Ls, grad_Ls, = offense_defense(gamma=gamma, fixed_defect=-3.0)
+  elif game == 'mix':
     dims, Ls, grad_Ls, = matching_and_ipd(gamma=gamma, fixed_defect=-3.0, weighting=mix_coeff)
   elif game == 'mp':
     dims, Ls, grad_Ls, = matching_and_ipd(gamma=0.9, fixed_defect=-3.0, weighting=1.0)
@@ -27,9 +29,10 @@ def setup_game_and_opt(game, mix_coeff, gamma, opt, alpha, num_lyapunov_iters, u
     dims, Ls, grad_Ls = ipd()
   else:
     assert False, "Provide a valid game choice"
+
   if opt == 'sgd':
     fixed_point_op, jac_fixed_point_op, update = simul_sgd(grad_Ls, alpha=alpha)
-  elif opt == 'eg':
+  elif opt == 'lola' or opt=='LOLA':
     fixed_point_op, jac_fixed_point_op, update = simul_lola(grad_Ls, alpha=alpha)
   else:
     assert False, "Provide a valid optimizer choice"
@@ -37,8 +40,12 @@ def setup_game_and_opt(game, mix_coeff, gamma, opt, alpha, num_lyapunov_iters, u
   @jax.jit 
   def get_random_direction(key):
     key, subkey = jax.random.split(key)
-    direction = jax.random.uniform(key=subkey, shape=(dims[0] + dims[1],), 
-                                   minval=-1.0, maxval=1.0)
+    try:
+      direction = jax.random.uniform(key=subkey, shape=(dims[0] + dims[1] + dims[2],), 
+                                    minval=-1.0, maxval=1.0)
+    except IndexError:
+      direction = jax.random.uniform(key=subkey, shape=(dims[0] + dims[1],), 
+                                    minval=-1.0, maxval=1.0)
     direction = direction / jnp.linalg.norm(direction)
     return direction, key
 

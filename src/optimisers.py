@@ -1,9 +1,7 @@
 import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
-import jax
-
-#jax.default_device = jax.devices("gpu")[0]
+pkg_resources.require("jax==0.2.22")
+pkg_resources.require("jaxlib==0.1.76")
+import jax 
 
 def simul_sgd(grad_func, alpha=0.025):
   @jax.jit

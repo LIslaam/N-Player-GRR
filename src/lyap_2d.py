@@ -1,6 +1,3 @@
-import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
 import os
 import jax
 import jax.numpy as jnp
@@ -45,12 +42,14 @@ def do_2d_lyapunov(game, seed, mix_coeff, gamma,
         eps = 1e-8
         x_ = logit(np.linspace(0.0 + eps, 1.0 - eps, num=num_bin))
         y_ = logit(np.linspace(0.0 + eps, 1.0 - eps, num=num_bin))
+        @jax.jit
         def activation(x): return sigmoid(x)
     else:
         low_lim_x, up_lim_x = -8.0, 8.0
         low_lim_y, up_lim_y = low_lim_x, up_lim_x
         x_ = np.linspace(low_lim_x, up_lim_x, num=num_bin)
         y_ = np.linspace(low_lim_y, up_lim_y, num=num_bin)
+        @jax.jit
         def activation(x): return x
     
     x,y = np.meshgrid(x_, y_)
@@ -118,6 +117,7 @@ def do_2d_lyapunov(game, seed, mix_coeff, gamma,
         color = 'r' #cm.rainbow(np.linspace(0, 1, len(x_)*len(y_)))
         i=0
         num_iters = num_lyapunov_iters
+        #for i in tqdm(range(num_bin)):
         for x in x_:
             for y in y_:
                 th_current = jnp.array([x, y])
@@ -143,9 +143,8 @@ def do_2d_lyapunov(game, seed, mix_coeff, gamma,
                         file.write(f"iter={_},det={determinants[-1]},trace={traces[-1]},lyap={lyaps[-1]},loss={losses[-1]},th={ths[-1]}\n") #th={ths[-1]}
                 ths = np.array(ths)
                 axs.plot(activation(ths[:, 0]), activation(ths[:, 1]), alpha=0.1, c=color)
-                print([activation(ths[:, 0]), activation(ths[:, 1])])
                 i += 1
-    
+        
     if do_legend:
         plt.legend(loc='upper left')
 
