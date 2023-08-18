@@ -1,8 +1,10 @@
 import pkg_resources
-pkg_resources.require("jax==0.2.22")
-pkg_resources.require("jaxlib==0.1.76")
+#pkg_resources.require("jax==0.2.22")
+#pkg_resources.require("jaxlib==0.1.76")
 import jax
 import jax.numpy as jnp
+
+#jax.default_device = jax.devices("gpu")[0]
 
 @jax.jit
 def sigmoid(x): return 1 / (1 + jnp.exp(-x))

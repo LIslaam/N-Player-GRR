@@ -1,6 +1,3 @@
-import pkg_resources
-pkg_resources.require("jax==0.2.22")
-pkg_resources.require("jaxlib==0.1.76")
 import os
 import jax
 import jax.numpy as jnp
@@ -9,7 +6,7 @@ import argparse
 from lyap_2d import do_2d_lyapunov
 from lyap_3d import do_3d_lyapunov
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+jax.default_device = jax.devices("gpu")[0]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--game", type=str, required=True)
@@ -36,7 +33,7 @@ if __name__ == "__main__":
     ax_key = 'grad'
     d_strategy = 'do_ub'
     num_directions = 1
-    num_lyapunov_iters = 10
+    num_lyapunov_iters = 40
 
     do_sigmoid_range = True # Range between 0 and 1
     do_legend = False
@@ -51,6 +48,7 @@ if __name__ == "__main__":
         game_labels = 'Mixed Small IPD and MP'
     elif game == 'mp':
         game_labels = 'Matching Pennies'
+    elif ga
 
     if opt == 'sgd':
         opt_labels = 'SGD'
@@ -71,7 +69,7 @@ if __name__ == "__main__":
     else: assert False, 'Use a valid d_strategy'
 
     print(f"\t\t\t\t\t d_stratregy = {d_strategy}")
-    save_name = 'test_thetas_2d' # f'{game_labels[i]} {opt_labels[j]} $lr=${alpha}' #{alpha}' #{num_lyapunov_iters}-step Trajectories'
+    save_name = f'{game_labels} {opt_labels} $lr=${alpha}' #{alpha}' #{num_lyapunov_iters}-step Trajectories'
     #f"Game={game}_Opt={opt}_SigRange={do_sigmoid_range}_Key={temp_ax_key}_Num={num_lyapunov_iters}_dstrat={d_strategy}"
     title = f'{game_labels} {opt_labels} $lr=${alpha}'
 
