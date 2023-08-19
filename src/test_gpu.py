@@ -7,4 +7,4 @@ print(jaxlib.__version__)
 
 print(jax.devices())
 
-jax.grad(jnp.linalg.det)(jnp.eye(2))
+print(jax.grad(jnp.linalg.det)(jnp.eye(2)))

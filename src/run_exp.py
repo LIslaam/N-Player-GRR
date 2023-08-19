@@ -1,6 +1,3 @@
-import pkg_resources
-pkg_resources.require("jax==0.2.22")
-pkg_resources.require("jaxlib==0.1.76")
 import os
 import jax
 import jax.numpy as jnp
@@ -34,7 +31,7 @@ if __name__ == "__main__":
     
     mix_coeff = 0.25
     gamma = 0.9
-    ax_key = 'grad'
+    ax_key = 'lyapunov'
     d_strategy = 'do_ub'
     num_directions = 1
     num_lyapunov_iters = 40
@@ -46,12 +43,21 @@ if __name__ == "__main__":
     use_smart_dir=False
     do_trajectories=True
 
-    if game == 'small-ipd':
-        game_labels = 'Small IPD'
-    elif game == 'mix':
-        game_labels = 'Mixed Small IPD and MP'
-    elif game == 'mp':
-        game_labels = 'Matching Pennies'
+    if args.dimensions == 2:
+        if game == 'small-ipd':
+            game_labels = 'Small IPD'
+        elif game == 'mix':
+            game_labels = 'Mixed Small IPD and MP'
+        elif game == 'mp':
+            game_labels = 'Matching Pennies'
+        else:
+            raise NotImplementedError
+        
+    elif args.dimensions == 3:
+        if game == 'offense-defense' or game=='o-d':
+            game_labels = 'Offense-Defense'
+        else:
+            raise NotImplementedError
 
     if opt == 'sgd':
         opt_labels = 'SGD'
