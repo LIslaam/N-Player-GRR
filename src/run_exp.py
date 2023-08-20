@@ -33,10 +33,10 @@ if __name__ == "__main__":
     
     mix_coeff = 0.25
     gamma = 0.9
-    ax_key = 'grad'
+    ax_key = 'lyapunov'
     d_strategy = 'do_ub'
-    num_directions = 1
-    num_lyapunov_iters = 10
+    num_directions = 3
+    num_lyapunov_iters = 40
 
     do_sigmoid_range = True # Range between 0 and 1
     do_legend = False
@@ -59,6 +59,8 @@ if __name__ == "__main__":
     elif args.dimensions == 3:
         if game == 'offense-defense' or game=='o-d':
             game_labels = 'Offense-Defense'
+        elif game == 'super-sym':
+            game_labels = 'Super Symmetric'
         else:
             raise NotImplementedError
 

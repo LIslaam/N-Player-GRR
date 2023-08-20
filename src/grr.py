@@ -10,6 +10,8 @@ def setup_game_and_opt(game, mix_coeff, gamma, opt, alpha, num_lyapunov_iters, u
                        entropy_objective_strat='min'):
   if game == 'offense-defense' or game=='o-d': # 3D game!
     dims, Ls, grad_Ls, = offense_defense(gamma=gamma, fixed_defect=-3.0)
+  elif game == 'super-sym': # 3D game!
+    dims, Ls, grad_Ls, = super_sym(gamma=gamma, fixed_defect=-3.0)
   elif game == 'mix':
     dims, Ls, grad_Ls, = matching_and_ipd(gamma=gamma, fixed_defect=-3.0, weighting=mix_coeff)
   elif game == 'mp':
