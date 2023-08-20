@@ -1,6 +1,4 @@
-#import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
+import os
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -8,7 +6,7 @@ import argparse
 from lyap_2d import do_2d_lyapunov
 from lyap_3d import do_3d_lyapunov
 
-print(jax.devices())
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--game", type=str, required=True)
@@ -35,8 +33,8 @@ if __name__ == "__main__":
     gamma = 0.9
     ax_key = 'lyapunov'
     d_strategy = 'do_ub'
-    num_directions = 3
-    num_lyapunov_iters = 40
+    num_directions = 1
+    num_lyapunov_iters = 10
 
     do_sigmoid_range = True # Range between 0 and 1
     do_legend = False
@@ -44,7 +42,6 @@ if __name__ == "__main__":
     tune_every_dir=False
     use_smart_dir=False
     do_trajectories=True
-
 
     if args.dimensions == 2:
         if game == 'small-ipd':

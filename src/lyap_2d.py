@@ -1,6 +1,3 @@
-#import pkg_resources
-#pkg_resources.require("jax==0.2.22")
-#pkg_resources.require("jaxlib==0.1.76")
 import os
 import jax
 import jax.numpy as jnp
@@ -12,6 +9,7 @@ from environments import *
 plt.rcParams.update({'font.size': 22})
 plt.rcParams.update({'font.family': 'serif'})
 
+#jax.default_device = jax.devices("gpu")[0]
 
 def do_2d_lyapunov(game, seed, mix_coeff, gamma,
                     # Problem setup
