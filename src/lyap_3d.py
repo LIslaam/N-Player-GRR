@@ -118,6 +118,8 @@ def do_3d_lyapunov(game, seed, mix_coeff, gamma,
         cbaryz.set_label(r'Lyapunov exponent', rotation=270, labelpad=25)
         cbarxz = fig.colorbar(cxz, fraction=0.046, pad=0.04)
         cbarxz.set_label(r'Lyapunov exponent', rotation=270, labelpad=25)
+    else:
+        raise NotImplementedError
 
     if do_trajectories:
         color = 'r' #cm.rainbow(np.linspace(0, 1, len(x_)*len(y_)))
