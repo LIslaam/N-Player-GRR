@@ -108,9 +108,9 @@ def do_3d_lyapunov(game, seed, mix_coeff, gamma,
         levels_xz = [levels[n][:num_bin, 0] for n in range(num_bin)]
         levels_xz = [[levels_xz[i][j] for i in range(num_bin)] for j in range(num_bin)] # Rotating array
 
-        cxy = axsxy.contourf(activation(x_xy), activation(y_xy), levels[0], num_levels)
-        cyz = axsyz.contourf(activation(y_yz), activation(z_yz), levels_yz, num_levels)
-        cxz = axsxz.contourf(activation(x_xz), activation(z_xz), levels_xz, num_levels)
+        cxy = axsxy.contourf(activation(x_xy), activation(y_xy), levels[0], num_levels, alpha=0.5)
+        cyz = axsyz.contourf(activation(y_yz), activation(z_yz), levels_yz, num_levels, alpha=0.5)
+        cxz = axsxz.contourf(activation(x_xz), activation(z_xz), levels_xz, num_levels, alpha=0.5)
 
         cbarxy = fig.colorbar(cxy, fraction=0.046, pad=0.04)
         cbarxy.set_label(r'Lyapunov exponent', rotation=270, labelpad=25)
